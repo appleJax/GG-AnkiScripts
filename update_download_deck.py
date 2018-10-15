@@ -4,13 +4,15 @@ import dropbox
 
 from dropbox.files import WriteMode
 # Load Anki library
-Sys.path.append(os.getcwd() + '/anki') 
+sys.path.append('/Users/admin/Dev/JavaScript/GameGogakuen/GG-AnkiScripts/anki') 
 from anki.storage import Collection
 from anki.exporting import AnkiPackageExporter
+from anki.importing import AnkiPackageImporter
 
 from pymongo import MongoClient
 from config import DB, MONGO_DB_URI, DROPBOX_AUTH_TOKEN
 
+IMPORT_PATH = '/Users/admin/Dropbox/KevNI/Japanese Decks/Public Decks/'
 BASE_DECK = 'Gamegogakuen JP'
 OUTPUT_FILE_NAME = 'Gamegogakuen_JP.apkg'
 OUTPUT_PATH = '/Users/admin/Desktop/' + OUTPUT_FILE_NAME
@@ -20,6 +22,17 @@ COLLECTION_PATH = '/Users/admin/Library/Application Support/Anki2/User 1/collect
 
 # Load the Collection
 col = Collection(COLLECTION_PATH, log=False) # Entry point to the API
+
+# Clear collection
+for did in col.decks.allIds():
+    col.decks.rem(did, True)
+col.save()
+
+# Import game decks
+for filename in os.listdir(IMPORT_PATH):
+    apkg = IMPORT_PATH + filename
+    AnkiPackageImporter(col, apkg).run()
+col.save()
 
 # Create a base dynamic deck
 base_deck_id = col.decks.newDyn(BASE_DECK)
@@ -68,12 +81,17 @@ exporter = AnkiPackageExporter(col)
 exporter.did = base_deck_id
 exporter.exportInto(OUTPUT_PATH)
 
+# Clean up collection
+for did in col.decks.allIds():
+    col.decks.rem(did, True)
+col.save()
+
 print('Export Deck: Success')
 
 # Upload new deck to dropbox
 dbx = dropbox.Dropbox(DROPBOX_AUTH_TOKEN)
 file = open(OUTPUT_PATH, "rb")
-dropbox_path = '/decks/' + OUTPUT_FILE_NAME
+dropbox_path = '/Gamegogakuen JP Anki Cards/' + OUTPUT_FILE_NAME
 
 dbx.files_upload(
     file.read(),

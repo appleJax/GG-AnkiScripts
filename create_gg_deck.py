@@ -1,8 +1,6 @@
 import sys, os
 import time
-import dropbox
 
-from dropbox.files import WriteMode
 # Load Anki library
 sys.path.append('/Users/admin/Dev/JavaScript/GameGogakuen/GG-AnkiScripts/anki') 
 from anki.storage import Collection
@@ -87,31 +85,5 @@ col.save()
 
 print('Export Deck: Success')
 
-# Upload new deck to dropbox
-dbx = dropbox.Dropbox(DROPBOX_AUTH_TOKEN)
-file = open(OUTPUT_PATH, "rb")
-dropbox_path = '/Gamegogakuen JP Anki Cards/' + OUTPUT_FILE_NAME
-
-dbx.files_upload(
-    file.read(),
-    dropbox_path,
-    mode=WriteMode.overwrite)
-
-print('Upload to Dropbox: Success')
-
-# Clean up exported deck
-file.close()
-os.remove(OUTPUT_PATH)
-
-# Update LAST_MODIFIED timestamp in database
-now = int(round(time.time() * 1000))
-timestamps = db.timestamps
-
-timestamps.update_one({}, {
-    '$set': {
-        'downloadUpdated': now
-    }})
-
-print('Update LAST_MODIFIED timestamp: Success')
-
+# Clean up
 client.close()

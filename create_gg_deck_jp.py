@@ -2,7 +2,7 @@ import sys, os
 import time
 
 # Load Anki library
-sys.path.append('/Users/admin/Dev/JavaScript/GameGogakuen/GG-AnkiScripts/anki') 
+sys.path.append('/Users/admin/Dev/JavaScript/GameGogakuen/GG-AnkiScripts/anki')
 from anki.storage import Collection
 from anki.exporting import AnkiPackageExporter
 from anki.importing import AnkiPackageImporter
